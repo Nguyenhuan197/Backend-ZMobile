@@ -1,82 +1,20 @@
-📱 Backend-ZMobile
+🚀 Backend-ZMobile
+<p align="center"> RESTful API for ZMobile E-commerce System Built with Node.js, Express & MongoDB </p> <p align="center"> <img src="https://img.shields.io/badge/Node.js-18+-green" /> <img src="https://img.shields.io/badge/Express.js-Backend-black" /> <img src="https://img.shields.io/badge/MongoDB-Atlas-brightgreen" /> <img src="https://img.shields.io/badge/License-MIT-blue" /> </p>
+📌 Overview
 
-Backend-ZMobile là RESTful API được xây dựng bằng Node.js + Express + MongoDB phục vụ hệ thống thương mại điện tử ZMobile.
-Hệ thống tập trung vào quản lý sản phẩm, người dùng và xử lý nghiệp vụ cốt lõi một cách bảo mật và tối ưu.
+Backend-ZMobile là hệ thống API phục vụ ứng dụng thương mại điện tử ZMobile.
+Dự án được xây dựng theo kiến trúc tách lớp rõ ràng, tối ưu bảo mật và dễ mở rộng.
 
-🚀 Features
+✨ Key Features
 
-✅ Product CRUD (Create, Read, Update, Delete)
+🔐 JWT Authentication & Role Authorization
 
-🔐 Authentication & Authorization (JWT)
+📦 Product Management (CRUD)
 
-🌍 Multilingual Response (VI / EN)
+👤 User Management
 
-🗄 MongoDB Integration (Mongoose ODM)
+🌍 Multilingual API Response (VI / EN)
 
-🧩 Centralized Error Handling Middleware
+⚙️ Centralized Error Handling
 
-⚙️ Environment-based Configuration
-
-🛠 Tech Stack
-
-Runtime: Node.js
-
-Framework: Express.js
-
-Database: MongoDB (Atlas)
-
-ODM: Mongoose
-
-Others: dotenv, cors
-
-Package Manager: npm
-
-📂 Project Structure
-Backend-ZMobile/
-│── src/
-│   ├── controllers/
-│   ├── models/
-│   ├── routes/
-│   ├── middleware/
-│   ├── config/
-│   └── app.js
-│
-│── .env
-│── package.json
-│── server.js
-
-⚙️ Installation
-1️⃣ Clone repository
-git clone https://github.com/username/Backend-ZMobile.git
-cd Backend-ZMobile
-
-2️⃣ Install dependencies
-npm install
-
-3️⃣ Setup environment variables
-
-Create a .env file in root directory:
-
-PORT=3000
-MONGODB_URI=your_mongodb_connection_string
-JWT_SECRET=your_secret_key
-
-4️⃣ Run server
-npm start
-
-
-Server runs at:
-
-http://localhost:3000
-
-📌 API Base URL
-/api/v1
-
-🧠 Author
-
-Developed by Huân Nguyễn Đình
-Backend Developer | Security Enthusiast
-
-📄 License
-
-This project is licensed under the MIT License.
+🧩 Modular Folder Structure

@@ -5,7 +5,11 @@ const userModule = require('./modules/user');
 const productRoute = require('./modules/product');
 const categoryRoute = require('./modules/category');
 const trademarkRoute = require('./modules/trademark');
-const cloudinary = require('./config/cloudinary');
+const advertisingSlides = require('./modules/advertisingSlides');
+const order = require('./modules/order');
+
+
+// const cloudinary = require('./config/cloudinary');
 const connectDB = require('./config/Db');
 
 
@@ -36,6 +40,8 @@ app.use('/api/users', userModule);
 app.use('/api/product', productRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/trademark', trademarkRoute);
+app.use('/api/advertising-Slides', advertisingSlides);
+app.use('/api/order', order);
 
 
 

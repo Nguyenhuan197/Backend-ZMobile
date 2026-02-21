@@ -3,7 +3,7 @@ const router = express.Router();
 
 // Fake database
 let users = [
-    { id: 1, name: "Huân" },
+    { id: 1, name: "Huân Test" },
     { id: 2, name: "Admin" }
 ];
 

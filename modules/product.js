@@ -68,10 +68,26 @@ const stateTransition = async (req, res, next) => {
     }
 }
 
+const searchProduct = async (req, res, next) => {
+    const { keySearch } = req.query;
+    try {
+        const searchRegex = new RegExp(keySearch, 'i');
+        const result = await connectSchema.find({
+            name: { $regex: searchRegex }
+        });
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Tìm kiếm thất bại', mesage_en: 'Product not found', status: false, data: [] });
+        return res.status(200).json({ mesage_vn: 'Tìm kiếm thành công', mesage_en: 'Search successful', status: true, data: result });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
 
 
 router.post("/add", addProductLogic);
 router.get("/view", getProduct);
 router.get("/viewDetail/:id", getProductDetail);
 router.put("/state-Transition/:id", stateTransition);
+router.get("/search-Product", searchProduct);
 module.exports = router;

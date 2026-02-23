@@ -93,7 +93,7 @@ const viewOne = async (req, res, next) => {
     try {
         const result = await connectSchema
             .findOne({ _id })
-            .select('name image email phone deliveryAddress');
+            .select('name image email phone deliveryAddress role');
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {

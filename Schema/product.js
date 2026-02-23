@@ -20,7 +20,7 @@ const productSchema = new mongoose.Schema(
         img: imageSchema,
         imgDetail: [imageSchema],
         status: { type: Boolean, default: true },
-        view: { type: Number, default: 1, require: true }
+        view: { type: Number, default: 1, required: true }
     },
     { collection: "Product" },
     { timestamps: true });

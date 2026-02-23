@@ -6,6 +6,7 @@ const trademarkSchema = new mongoose.Schema(
         img: { type: String, required: true, default: 'NAV-IMG' },
         status: { type: Boolean, required: true, default: true }
     },
+
     { collection: "Trademark" }
 );
 

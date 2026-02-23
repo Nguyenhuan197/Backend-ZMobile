@@ -1,6 +1,10 @@
-
 require('dotenv').config();
 const express = require('express');
+const path = require('path');
+const cors = require('cors');
+
+// 1. Require các cấu hình & Route
+const connectDB = require('./config/Db');
 const userModule = require('./modules/user');
 const productRoute = require('./modules/product');
 const categoryRoute = require('./modules/category');
@@ -8,42 +12,42 @@ const trademarkRoute = require('./modules/trademark');
 const advertisingSlides = require('./modules/advertisingSlides');
 const order = require('./modules/order');
 
-
-// const cloudinary = require('./config/cloudinary');
-const connectDB = require('./config/Db');
-
-
+// 2. Khởi tạo App
 const app = express();
-app.use(express.json());
+
+// 3. Kết nối Database
 connectDB();
-const cors = require('cors');
 
+// 4. Cấu hình Middlewares
+app.use(express.json());
 
+// --- QUAN TRỌNG: Cấu hình Static Files để đọc ảnh ---
+// Khi dùng dòng này, file trong thư mục /public sẽ truy cập trực tiếp qua tên file
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 5. Cấu hình CORS
 const allowedOrigins = [
     "http://localhost:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5173",
 ];
-
 if (process.env.URL_FE) {
     allowedOrigins.push(process.env.URL_FE);
 }
 
-// CORS chính
 app.use(cors({
     origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
 
+// 6. Định nghĩa Routes
 app.use('/api/users', userModule);
 app.use('/api/product', productRoute);
 app.use('/api/category', categoryRoute);
 app.use('/api/trademark', trademarkRoute);
 app.use('/api/advertising-Slides', advertisingSlides);
 app.use('/api/order', order);
-
-
 
 app.get('/', (req, res) => {
     res.json({

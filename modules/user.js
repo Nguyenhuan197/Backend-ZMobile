@@ -134,10 +134,33 @@ const stateTransition = async (req, res, next) => {
 }
 
 
+const updateUser = async (req, res, next) => {
+    const _id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    const { name, phone, deliveryAddress } = req.body;
+    if (!name?.trim() || !phone?.trim() || !deliveryAddress?.trim()) return res.status(200).json({ message_vn: 'Vui lòng nhập đủ thông tin', message_en: 'Please enter all the required information', status: false });
+    const dataUpdate = { name, phone, deliveryAddress }
+
+    try {
+        const result = await connectSchema
+            .findByIdAndUpdate(
+                _id,
+                { $set: dataUpdate },
+                { new: true, runValidators: false }
+            );
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Cập nhật tài khoản thất bại', mesage_en: 'Account update failed.', status: false });
+        return res.status(200).json({ mesage_vn: 'Cập nhật tài khoản thành công', mesage_en: 'Account update successful', status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
 
 router.post("/add", addNew);
 router.post("/login", login);
 router.get("/view-All/:id", viewAll);
 router.get("/view-One/:id", viewOne);
 router.put("/state-Transition/:id/:idUser", stateTransition);
+router.put("/update-user/:id", updateUser);
 module.exports = router;

@@ -11,6 +11,9 @@ const categoryRoute = require('./modules/category');
 const trademarkRoute = require('./modules/trademark');
 const advertisingSlides = require('./modules/advertisingSlides');
 const order = require('./modules/order');
+const newsRouter = require('./modules/news');
+const infomationAdminRouter = require('./modules/infomationAdmin');
+
 
 // 2. Khởi tạo App
 const app = express();
@@ -41,6 +44,7 @@ app.use(cors({
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
 }));
 
+
 // 6. Định nghĩa Routes
 app.use('/api/users', userModule);
 app.use('/api/product', productRoute);
@@ -48,6 +52,10 @@ app.use('/api/category', categoryRoute);
 app.use('/api/trademark', trademarkRoute);
 app.use('/api/advertising-Slides', advertisingSlides);
 app.use('/api/order', order);
+app.use('/api/news', newsRouter);
+app.use('/api/infomation-Admin', infomationAdminRouter);
+
+
 
 app.get('/', (req, res) => {
     res.json({

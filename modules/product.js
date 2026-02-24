@@ -3,11 +3,16 @@ const router = express.Router();
 const connectSchema = require("../Schema/product");
 const mongoose = require('mongoose');
 
+const CheckToken = require("../modules/middlewares/checkToken");
+const auth = new CheckToken();
+const connectSchema__User = require("../Schema/user");
+
+
 
 const addProductLogic = async (req, res, next) => {
     try {
-        const { id_Trademark, name, price, describe, remainingQuantity, img, imgDetail } = req.body;
-        const newData = new connectSchema({ id_Trademark, name, price, describe, remainingQuantity, img, imgDetail })
+        const { id_Trademark, name, price, describe, remainingQuantity, img, imgDetail, present } = req.body;
+        const newData = new connectSchema({ id_Trademark, name, price, describe, remainingQuantity, img, imgDetail, present })
         const result = await newData.save();
         if (!result) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false })
         return res.status(201).json({ mesage_vn: 'Thêm thành công', mesage_en: 'More success', status: true });
@@ -37,12 +42,20 @@ const getProductDetail = async (req, res, next) => {
 
     try {
         const result = await connectSchema
-            .find({ _id })
-            .select('name price describe remainingQuantity img imgDetail')
+            .findById({ _id })
+            .select('name price describe remainingQuantity img imgDetail present')
             .populate('id_Trademark', 'name img');
 
+        const productRelateTo = await connectSchema
+            .find({
+                id_Trademark: result.id_Trademark._id,
+                _id: { $ne: result._id }   // loại bỏ sản phẩm hiện tại
+            })
+            .select('name price img')
+            .limit(4);
+
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: true, similarProducts: productRelateTo });
     } catch (error) {
         if (error) return next(error);
     }
@@ -84,10 +97,65 @@ const searchProduct = async (req, res, next) => {
 }
 
 
+const Admin_SelectProduct = async (req, res, next) => {
+    const { status } = req.query;
+    const _id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
 
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (_id !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const result = await connectSchema
+            .find({ status })
+            .select('name price img imgDetail')
+            .limit(20);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+const Admin__DetailProduct = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+    try {
+        const result = await connectSchema
+            .find({ _id })
+            .limit(20);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+
+// Cline
 router.post("/add", addProductLogic);
 router.get("/view", getProduct);
 router.get("/viewDetail/:id", getProductDetail);
 router.put("/state-Transition/:id", stateTransition);
 router.get("/search-Product", searchProduct);
+
+// Admin
+router.get("/admin-SelectAll/:id", Admin_SelectProduct);
+router.get("/admin-Detail/:id/:idUser", Admin__DetailProduct);
 module.exports = router;

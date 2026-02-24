@@ -191,7 +191,6 @@ router.get("/search-Product", searchProduct);
 router.get("/view-advertisement", advertisement);
 
 
-
 // Admin
 router.get("/admin-SelectAll/:id", Admin_SelectProduct);
 router.get("/admin-Detail/:id/:idUser", Admin__DetailProduct);

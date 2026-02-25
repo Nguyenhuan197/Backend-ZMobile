@@ -213,9 +213,7 @@ router.post("/add", addProductLogic);
 router.get("/view-product-phone", getProduct_Phone);
 router.get("/view-product-accessory", getProduct_Accessory);
 
-
-
-
+//
 router.get("/viewDetail/:id", getProductDetail);
 router.get("/search-Product", searchProduct);
 router.get("/view-advertisement", advertisement);

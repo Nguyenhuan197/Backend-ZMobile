@@ -68,13 +68,13 @@ const getProductDetail = async (req, res, next) => {
     try {
         const result = await connectSchema
             .findById({ _id })
-            .select('name price describe remainingQuantity img imgDetail present')
             .populate('id_Trademark', 'name img');
 
+        if (!result) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         const productRelateTo = await connectSchema
             .find({
                 id_Trademark: result.id_Trademark._id,
-                _id: { $ne: result._id }   // loại bỏ sản phẩm hiện tại
+                _id: { $ne: _id }
             })
             .select('name price img')
             .limit(4);

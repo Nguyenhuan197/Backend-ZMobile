@@ -22,11 +22,17 @@ const addProductLogic = async (req, res, next) => {
     }
 };
 
-const getProduct = async (req, res, next) => {
+
+const getProduct_Phone = async (req, res, next) => {
     const { status } = req.query;
     try {
         const result = await connectSchema
-            .find({ status })
+            .find({
+                status,
+                id_Trademark: {
+                    $ne: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
+                }
+            })
             .select('name price priceSale img')
             .limit(20);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -35,6 +41,25 @@ const getProduct = async (req, res, next) => {
         if (error) return next(error);
     }
 }
+
+
+const getProduct_Accessory = async (req, res, next) => {
+    const { status } = req.query;
+    try {
+        const result = await connectSchema
+            .find({
+                status,
+                id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
+            })
+            .select('name price priceSale img')
+            .limit(20);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
 
 const getProductDetail = async (req, res, next) => {
     const _id = req.params.id;
@@ -185,7 +210,12 @@ const transitionAdvertisement = async (req, res, next) => {
 
 // Cline
 router.post("/add", addProductLogic);
-router.get("/view", getProduct);
+router.get("/view-product-phone", getProduct_Phone);
+router.get("/view-product-accessory", getProduct_Accessory);
+
+
+
+
 router.get("/viewDetail/:id", getProductDetail);
 router.get("/search-Product", searchProduct);
 router.get("/view-advertisement", advertisement);

@@ -6,10 +6,9 @@ const mongoose = require('mongoose');
 
 const addNew = async (req, res, next) => {
     try {
-        const { id_Category, name, img } = req.body;
-        if (!mongoose.Types.ObjectId.isValid(id_Category)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+        const { name, img } = req.body;
         if (!name || !img) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false });
-        const newData = new connectSchema({ id_Category, name, img });
+        const newData = new connectSchema({ name, img });
         const result = await newData.save();
         if (!result) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false })
         return res.status(201).json({ mesage_vn: 'Thêm thành công', mesage_en: 'More success', status: true });
@@ -24,7 +23,6 @@ const viewAll = async (req, res, next) => {
         const result = await connectSchema
             .find({ status })
             .select('name img')
-            .populate('id_Category', 'name');
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {

@@ -7,7 +7,6 @@ const imageSchema = new mongoose.Schema({
 
 const trademarkSchema = new mongoose.Schema(
     {
-        id_Category: { type: mongoose.Schema.Types.ObjectId, ref: 'Category' },
         name: { type: String, required: true },
         img: imageSchema,
         status: { type: Boolean, required: true, default: true }

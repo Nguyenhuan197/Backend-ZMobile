@@ -51,7 +51,7 @@ const getProduct_Accessory = async (req, res, next) => {
                 status,
                 id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
             })
-            .select('name price priceSale img')
+            .select('name price priceSale img remainingQuantity')
             .limit(20);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });

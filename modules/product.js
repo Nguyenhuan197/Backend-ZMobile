@@ -34,7 +34,7 @@ const getProduct_Phone = async (req, res, next) => {
                 }
             })
             .select('name price priceSale img remainingQuantity')
-            .limit(20);
+            .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
     } catch (error) {
@@ -52,7 +52,7 @@ const getProduct_Accessory = async (req, res, next) => {
                 id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
             })
             .select('name price priceSale img remainingQuantity')
-            .limit(20);
+            .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
     } catch (error) {
@@ -139,7 +139,7 @@ const Admin_SelectProduct = async (req, res, next) => {
         const result = await connectSchema
             .find({ status })
             .select('name price img imgDetail')
-            .limit(20);
+            .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
     } catch (error) {
@@ -163,7 +163,7 @@ const Admin__DetailProduct = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({ _id })
-            .limit(20);
+            .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
     } catch (error) {
@@ -207,11 +207,34 @@ const transitionAdvertisement = async (req, res, next) => {
 }
 
 
+const TrademarkPrduct = async (req, res, next) => {
+    const id_Trademark = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(id_Trademark)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    try {
+        const result = await connectSchema
+            .find({
+                status: true,
+                id_Trademark
+            })
+            .select('name price priceSale img remainingQuantity')
+            .limit(50);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+
 
 // Cline
 router.post("/add", addProductLogic);
 router.get("/view-product-phone", getProduct_Phone);
 router.get("/view-product-accessory", getProduct_Accessory);
+router.get("/view-Trademark-Product/:id", TrademarkPrduct)
+
 
 //
 router.get("/viewDetail/:id", getProductDetail);

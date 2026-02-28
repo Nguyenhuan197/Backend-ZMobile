@@ -23,6 +23,7 @@ const addProductLogic = async (req, res, next) => {
 };
 
 
+// Danh sách sản phẩm điện thoại
 const getProduct_Phone = async (req, res, next) => {
     const { status } = req.query;
     try {
@@ -31,7 +32,8 @@ const getProduct_Phone = async (req, res, next) => {
                 status,
                 id_Trademark: {
                     $ne: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
-                }
+                },
+                priceSale: 0
             })
             .select('name price priceSale img remainingQuantity')
             .limit(50);
@@ -49,7 +51,8 @@ const getProduct_Accessory = async (req, res, next) => {
         const result = await connectSchema
             .find({
                 status,
-                id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
+                id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9"),
+                priceSale: 0
             })
             .select('name price priceSale img remainingQuantity')
             .limit(50);
@@ -61,6 +64,7 @@ const getProduct_Accessory = async (req, res, next) => {
 }
 
 
+// Chi tiết sản phẩm
 const getProductDetail = async (req, res, next) => {
     const _id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
@@ -86,6 +90,7 @@ const getProductDetail = async (req, res, next) => {
     }
 }
 
+// chuyển đổi trạng thái
 const stateTransition = async (req, res, next) => {
     const _id = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
@@ -106,6 +111,7 @@ const stateTransition = async (req, res, next) => {
     }
 }
 
+// tìm kiếm sản phẩm 
 const searchProduct = async (req, res, next) => {
     const { keySearch } = req.query;
     try {
@@ -122,6 +128,7 @@ const searchProduct = async (req, res, next) => {
 }
 
 
+// Phần quản trị - danh sách sản phẩm
 const Admin_SelectProduct = async (req, res, next) => {
     const { status } = req.query;
     const _id = req.params.id;
@@ -148,6 +155,7 @@ const Admin_SelectProduct = async (req, res, next) => {
 }
 
 
+// Quản trị chi tiết sản phẩm
 const Admin__DetailProduct = async (req, res, next) => {
     const _id = req.params.id;
     const idUser = req.params.idUser;

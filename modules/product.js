@@ -227,13 +227,32 @@ const TrademarkPrduct = async (req, res, next) => {
 }
 
 
+// Sản phẩm SEO ĐĂNG TRONG CHƯƠNG TRÌNH GIẢM GIÁ
+const salePrice = async (req, res, next) => {
+    try {
+        const result = await connectSchema
+            .find({
+                status: true,
+                priceSale: { $gt: 1 } // Sửa lỗi cú pháp so sánh ở đây
+            })
+            .select('name price img priceSale remainingQuantity')
+            .limit(10);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
 
 
 // Cline
 router.post("/add", addProductLogic);
 router.get("/view-product-phone", getProduct_Phone);
 router.get("/view-product-accessory", getProduct_Accessory);
-router.get("/view-Trademark-Product/:id", TrademarkPrduct)
+router.get("/view-Trademark-Product/:id", TrademarkPrduct);
+router.get("/view-sale", salePrice);
+
 
 
 //

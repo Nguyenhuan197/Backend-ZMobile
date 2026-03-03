@@ -128,58 +128,6 @@ const searchProduct = async (req, res, next) => {
 }
 
 
-// Phần quản trị - danh sách sản phẩm
-const Admin_SelectProduct = async (req, res, next) => {
-    const { status } = req.query;
-    const _id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
-
-    // Check Token
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = auth.verifyAccessToken(token);
-    if (_id !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
-    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
-    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
-
-
-    try {
-        const result = await connectSchema
-            .find({ status })
-            .select('name price img imgDetail')
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
-
-
-// Quản trị chi tiết sản phẩm
-const Admin__DetailProduct = async (req, res, next) => {
-    const _id = req.params.id;
-    const idUser = req.params.idUser;
-    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
-
-    // Check Token
-    const token = req.headers.authorization?.split(' ')[1];
-    const decoded = auth.verifyAccessToken(token);
-    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
-    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
-    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
-
-    try {
-        const result = await connectSchema
-            .find({ _id })
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
-
-
 const advertisement = async (req, res, next) => {
     try {
         const result = await connectSchema
@@ -254,6 +202,124 @@ const salePrice = async (req, res, next) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+// -------------- ADMIN ------------------
+
+
+// Phần quản trị - danh sách sản phẩm
+const Admin_SelectProduct = async (req, res, next) => {
+    const { status } = req.query;
+    const _id = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (_id !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const result = await connectSchema
+            .find({ status })
+            .select('name price img advertisement remainingQuantity')
+            .limit(50);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+// Quản trị chi tiết sản phẩm
+const Admin__DetailProduct = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+    try {
+        const result = await connectSchema
+            .find({ _id })
+            .limit(50);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+// Danh sách sản phẩm SALE
+const Admin_SelectProductSale = async (req, res, next) => {
+    const { statusSale } = req.query;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(idUser)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        if (statusSale === 'SALE') {
+            const result = await connectSchema
+                .find({
+                    status: true,
+                    priceSale: { $gt: 1 } // Sửa lỗi cú pháp so sánh ở đây
+                })
+                .select('name price img priceSale remainingQuantity')
+                .limit(10);
+
+            if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+            return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        }
+
+        else {
+            const result = await connectSchema
+                .find({
+                    status: true,
+                    priceSale: 0
+                })
+                .select('name price img priceSale remainingQuantity')
+                .limit(10);
+
+            if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+            return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        }
+
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+
+
+
+
+
 // Cline
 router.post("/add", addProductLogic);
 router.get("/view-product-phone", getProduct_Phone);
@@ -270,8 +336,13 @@ router.get("/view-advertisement", advertisement);
 
 
 // Admin
-router.get("/admin-SelectAll/:id", Admin_SelectProduct);
-router.get("/admin-Detail/:id/:idUser", Admin__DetailProduct);
+router.get("/admin-SelectAll/:idUser", Admin_SelectProduct); // tất cả sản phẩm 
+router.get("/admin-Select-ProductSale&No-Sale/:idUser", Admin_SelectProductSale); // DSach SP SALE và Không Sale ĐK SALE & NO
+// router.get("/admin-Number-Of-Product-Sales/:idUser", Admin_NumberOfProductSales)
+router.get("/admin-Detail/:id/:idUser", Admin__DetailProduct); // chi tiết sản phẩm
+
+
+
 router.put("/state-Transition/:id", stateTransition);
 router.put("/state-Transition-advertisement/:id", transitionAdvertisement);
 module.exports = router;

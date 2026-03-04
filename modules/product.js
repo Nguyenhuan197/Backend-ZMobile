@@ -317,9 +317,6 @@ const Admin_SelectProductSale = async (req, res, next) => {
 
 
 
-
-
-
 // Cline
 router.post("/add", addProductLogic);
 router.get("/view-product-phone", getProduct_Phone);

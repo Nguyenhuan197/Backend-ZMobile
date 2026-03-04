@@ -46,7 +46,9 @@ login = async (req, res, next) => {
 
         if (resultPassword.role === 'Admin') {
             const dataToken = { _id: resultPassword._id }
-            const token = connectToken.sign(dataToken, secretKey, { expiresIn: '60m' });
+            const token = connectToken.sign(dataToken, secretKey, { expiresIn: expirationDateTocken });
+            // Thay vì '60m' cho 60p có hạn tocken
+
             res.status(201).json({ message_vn: 'Chào mừng Admin bạn đã quay lại!', message_en: 'Welcome back Admin!', token, status: true, role: resultPassword.role });
         }
 

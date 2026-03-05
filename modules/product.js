@@ -340,7 +340,7 @@ const Admin_SelectProductAdvertisement = async (req, res, next) => {
                 status: true,
                 advertisement: isAdvertisement  // Sửa lỗi cú pháp so sánh ở đây
             })
-            .select('name price img priceSale remainingQuantity')
+            .select('name price img priceSale remainingQuantity advertisement')
             .limit(10);
 
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -386,9 +386,6 @@ const Admin_transitionAdvertisement = async (req, res, next) => {
 
 
 // Cline
-
-
-
 router.get("/view-product-phone", getProduct_Phone);
 router.get("/view-product-accessory", getProduct_Accessory);
 router.get("/view-Trademark-Product/:id", TrademarkPrduct);

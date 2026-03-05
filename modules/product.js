@@ -22,29 +22,6 @@ const addProductLogic = async (req, res, next) => {
 };
 
 
-const Admin_EditProduct = async (req, res, next) => {
-    const { id } = req.params;
-    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
-
-    try {
-        const { name, price, describe, remainingQuantity, present, priceSale } = req.body;
-        const dataEdit = { name, price, describe, remainingQuantity, present, priceSale }
-        const result = await connectSchema.findByIdAndUpdate(
-            id,
-            { $set: dataEdit },
-            {
-                new: true,
-                runValidators: true
-            }
-        );
-
-        if (!result) return res.status(400).json({ mesage_vn: 'Cập nhật thất bại', mesage_en: 'Update failed', status: false });
-        return res.status(200).json({ mesage_vn: 'Cập nhật thành công', mesage_en: 'Update successful', status: true });
-
-    } catch (error) {
-        if (error) return next(error);
-    }
-};
 
 
 
@@ -382,6 +359,40 @@ const Admin_transitionAdvertisement = async (req, res, next) => {
 }
 
 
+const Admin_EditProduct = async (req, res, next) => {
+    const { id } = req.params;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const { name, price, describe, remainingQuantity, present, priceSale } = req.body;
+        const dataEdit = { name, price, describe, remainingQuantity, present, priceSale }
+        const result = await connectSchema.findByIdAndUpdate(
+            id,
+            { $set: dataEdit },
+            {
+                new: true,
+                runValidators: true
+            }
+        );
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Cập nhật thất bại', mesage_en: 'Update failed', status: false });
+        return res.status(200).json({ mesage_vn: 'Cập nhật thành công', mesage_en: 'Update successful', status: true });
+
+    } catch (error) {
+        if (error) return next(error);
+    }
+};
+
+
 
 
 
@@ -401,7 +412,7 @@ router.get("/view-advertisement", advertisement);
 
 // Admin
 router.post("/add", addProductLogic);
-router.put("/admin-Product-Edit/:id", Admin_EditProduct);
+router.put("/admin-Product-Edit/:id/:idUser", Admin_EditProduct);
 
 router.get("/admin-SelectAll/:idUser", Admin_SelectProduct); // tất cả sản phẩm 
 router.get("/admin-Select-ProductSale&No-Sale/:idUser", Admin_SelectProductSale); // DSach SP SALE và Không Sale ĐK SALE & NO

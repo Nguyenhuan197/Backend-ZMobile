@@ -79,7 +79,7 @@ const viewAll = async (req, res, next) => {
     // Bước lấy dữ liệu như thường
     try {
         const result = await connectSchema
-            .find({})
+            .find({ role: 'Cline' })
             .select('name image email status phone');
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });

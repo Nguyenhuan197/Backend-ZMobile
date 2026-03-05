@@ -266,7 +266,7 @@ const Admin__DetailProduct = async (req, res, next) => {
             .find({ _id })
             .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {
         if (error) return next(error);
     }

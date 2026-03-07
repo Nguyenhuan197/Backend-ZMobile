@@ -79,6 +79,7 @@ const getProductDetail = async (req, res, next) => {
         if (!result) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         const productRelateTo = await connectSchema
             .find({
+                status: true,
                 id_Trademark: result.id_Trademark._id,
                 _id: { $ne: _id }
             })

@@ -134,7 +134,7 @@ const searchProduct = async (req, res, next) => {
 const advertisement = async (req, res, next) => {
     try {
         const result = await connectSchema
-            .find({ advertisement: true })
+            .find({ advertisement: true, status: true })
             .select('name price img priceSale remainingQuantity')
             .limit(8);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -398,17 +398,17 @@ const Admin_EditProduct = async (req, res, next) => {
 
 
 // Cline
-router.get("/view-product-phone", getProduct_Phone);
+router.get("/view-product-phone", getProduct_Phone); // dánh sách sản phẩm điện thoại
 router.get("/view-product-accessory", getProduct_Accessory);
-router.get("/view-Trademark-Product/:id", TrademarkPrduct);
-router.get("/view-sale", salePrice);
+router.get("/view-Trademark-Product/:id", TrademarkPrduct); // 
+router.get("/view-sale", salePrice); // danh sách sản phẩm SALE 
 
 
 
 //
-router.get("/viewDetail/:id", getProductDetail);
-router.get("/search-Product", searchProduct);
-router.get("/view-advertisement", advertisement);
+router.get("/viewDetail/:id", getProductDetail); // chi tiết sản phẩm
+router.get("/search-Product", searchProduct); // tìm kiếm sản phẩm
+router.get("/view-advertisement", advertisement); // slide quảng cáo
 
 
 // Admin

@@ -214,7 +214,7 @@ const Admin_SelectProduct = async (req, res, next) => {
 
 
     try {
-        const filter = status === 'NAV' ? { status } : {};
+        const filter = status === 'NAV' ? {} : { status };
         const result = await connectSchema
             .find(filter)
             .select('name price img advertisement remainingQuantity status')

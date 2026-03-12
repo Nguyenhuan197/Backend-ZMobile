@@ -214,12 +214,22 @@ const Admin_SelectProduct = async (req, res, next) => {
 
 
     try {
-        const result = await connectSchema
-            .find({ status })
-            .select('name price img advertisement remainingQuantity status')
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        if (status === 'NAV') {
+            const result = await connectSchema
+                .find({ status })
+                .select('name price img advertisement remainingQuantity status')
+                .limit(50);
+            if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+            return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        } else {
+            const result = await connectSchema
+                .select('name price img advertisement remainingQuantity status')
+                .limit(50);
+            if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+            return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+        }
+
+
     } catch (error) {
         if (error) return next(error);
     }

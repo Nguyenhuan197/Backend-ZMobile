@@ -61,10 +61,9 @@ const update = async (req, res, next) => {
     const _idUser = req.params.idUser;
     if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
     const {
-        nameLogo, contact, phone, nameAdmin, address, email, slogan, pageFB, ticktock, shopee, workingHours, partnerDelivery
+        nameLogo, contact, phone, nameAdmin, address, email, slogan, pageFB, ticktock, shopee, chotot, workingHours, partnerDelivery
     } = req.body;
-    const dataUpdate = { nameLogo, contact, phone, nameAdmin, address, email, slogan, pageFB, ticktock, shopee, workingHours, partnerDelivery }
-
+    const dataUpdate = { nameLogo, contact, phone, nameAdmin, address, email, slogan, pageFB, ticktock, shopee, chotot, workingHours, partnerDelivery }
 
 
     // Check Token

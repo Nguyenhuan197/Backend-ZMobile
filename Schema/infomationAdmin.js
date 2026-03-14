@@ -3,6 +3,7 @@
 const mongoose = require("mongoose");
 const InfomationAdminSchema = new mongoose.Schema(
     {
+        accountStatus: { type: Boolean, default: true },
         nameLogo: { type: String, required: true },
         contact: { type: String, required: true },
         phone: { type: String, required: true },
@@ -13,8 +14,11 @@ const InfomationAdminSchema = new mongoose.Schema(
         pageFB: { type: String, required: true },
         ticktock: { type: String, required: true },
         shopee: { type: String, required: true },
+        chotot: { type: String, required: true },
         workingHours: { type: String, required: true },
         view: { type: Number, default: 1 },
+        partnerDelivery: { type: String, default: '' },
+        accountStatus: { type: Boolean, default: true }
     },
 
     { collection: "InfomationAdmin" }

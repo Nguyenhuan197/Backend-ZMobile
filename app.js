@@ -7,7 +7,6 @@ const cors = require('cors');
 const connectDB = require('./config/Db');
 const userModule = require('./modules/user');
 const productRoute = require('./modules/product');
-const categoryRoute = require('./modules/category');
 const trademarkRoute = require('./modules/trademark');
 const order = require('./modules/order');
 const newsRouter = require('./modules/news');
@@ -47,7 +46,6 @@ app.use(cors({
 // 6. Định nghĩa Routes
 app.use('/api/users', userModule);
 app.use('/api/product', productRoute);
-app.use('/api/category', categoryRoute);
 app.use('/api/trademark', trademarkRoute);
 app.use('/api/order', order);
 app.use('/api/news', newsRouter);

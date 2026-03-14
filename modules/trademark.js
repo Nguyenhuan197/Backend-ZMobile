@@ -2,9 +2,24 @@ const express = require("express");
 const router = express.Router();
 const connectSchema = require("../Schema/trademark");
 const mongoose = require('mongoose');
+const connectSchema__User = require("../Schema/user");
+const CheckToken = require("../modules/middlewares/checkToken");
+const auth = new CheckToken();
+
 
 
 const addNew = async (req, res, next) => {
+    const _id = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (_id !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
     try {
         const { name, img } = req.body;
         if (!name || !img) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false });
@@ -16,6 +31,7 @@ const addNew = async (req, res, next) => {
         if (error) return next(error);
     }
 };
+
 
 const viewAll = async (req, res, next) => {
     const { status } = req.query;
@@ -63,8 +79,7 @@ const stateTransition = async (req, res, next) => {
 }
 
 
-
-router.post("/add", addNew);
+router.post("/add/:idUser", addNew);
 router.get("/view", viewAll);
 router.delete("/delete/:id", deleteOne);
 router.put("/stateTransition/:id", stateTransition);

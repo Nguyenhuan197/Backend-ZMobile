@@ -12,17 +12,18 @@ const auth = new CheckToken();
 
 const addNew = async (req, res, next) => {
     const { name, sex, age, phone, city } = req.body;
-    if (!name.trim() || !sex.trim() || !age || !phone.trim() || !city.trim()) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false });
+    if (!name.trim() || !sex.trim() || !age || !phone.trim() || !city.trim()) return res.status(400).json({ mesage_vn: 'Ứng tuyển thất bại', mesage_en: 'Apply success', status: false });
 
     try {
         const newProduct = new connectSchema({ name, sex, age, phone, city });
         const result = await newProduct.save();
-        if (!result) return res.status(400).json({ mesage_vn: 'Thêm thất bại', mesage_en: 'More failures', status: false })
-        return res.status(201).json({ mesage_vn: 'Thêm thành công', mesage_en: 'More success', status: true });
+        if (!result) return res.status(400).json({ mesage_vn: 'Ứng tuyển thất bại', mesage_en: 'Apply failures', status: false })
+        return res.status(201).json({ mesage_vn: 'Ứng tuyển thành công', mesage_en: 'Apply success', status: true });
     } catch (error) {
         if (error) return next(error);
     }
 };
+
 
 const viewAll = async (req, res, next) => {
     const { status } = req.query;

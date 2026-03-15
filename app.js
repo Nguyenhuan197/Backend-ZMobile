@@ -10,21 +10,17 @@ const productRoute = require('./modules/product');
 const trademarkRoute = require('./modules/trademark');
 const order = require('./modules/order');
 const newsRouter = require('./modules/news');
+const recruitment = require('./modules/recruitment');
 const infomationAdminRouter = require('./modules/infomationAdmin');
+
 
 
 // 2. Khởi tạo App
 const app = express();
-
-// 3. Kết nối Database
 connectDB();
-
-// 4. Cấu hình Middlewares
 app.use(express.json());
-
-// --- QUAN TRỌNG: Cấu hình Static Files để đọc ảnh ---
-// Khi dùng dòng này, file trong thư mục /public sẽ truy cập trực tiếp qua tên file
 app.use(express.static(path.join(__dirname, 'public')));
+
 
 // 5. Cấu hình CORS
 const allowedOrigins = [
@@ -49,6 +45,7 @@ app.use('/api/product', productRoute);
 app.use('/api/trademark', trademarkRoute);
 app.use('/api/order', order);
 app.use('/api/news', newsRouter);
+app.use('/api/recruitment', recruitment);
 app.use('/api/infomation-Admin', infomationAdminRouter);
 
 

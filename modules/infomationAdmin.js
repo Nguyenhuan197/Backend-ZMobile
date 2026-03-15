@@ -25,7 +25,7 @@ const viewAll = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({})
-            .select('nameLogo contact phone nameAdmin address email slogan pageFB ticktock shopee chotot workingHours partnerDelivery');
+            .select('nameLogo contact phone nameAdmin address email slogan pageFB ticktock shopee chotot workingHours partnerDelivery accountStatus');
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {

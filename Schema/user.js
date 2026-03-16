@@ -5,12 +5,13 @@ const usersSchema = new mongoose.Schema(
     {
         name: { type: String, required: true, default: 'Chưa cập nhật' },
         email: { type: String, required: true },
-        password: { type: String, required: true },
+        password: { type: String, required: true, default: 'NAV - Google' },
         phone: { type: String, required: true, default: 'Chưa cập nhật' },
         image: { type: String, required: true, default: 'imageDefault.png' },
         status: { type: Boolean, required: true, default: true },
         deliveryAddress: { type: String, required: true, default: 'Chưa cập nhật' },
-        role: { type: String, required: true, default: 'Client' }
+        role: { type: String, required: true, default: 'Client' },
+        googleId: { type: String, default: 'NAV Google' }
     },
     {
         collection: "Users",

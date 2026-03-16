@@ -12,6 +12,8 @@ const order = require('./modules/order');
 const newsRouter = require('./modules/news');
 const recruitment = require('./modules/recruitment');
 const infomationAdminRouter = require('./modules/infomationAdmin');
+const google = require('./modules/google');
+
 
 
 
@@ -47,6 +49,8 @@ app.use('/api/order', order);
 app.use('/api/news', newsRouter);
 app.use('/api/recruitment', recruitment);
 app.use('/api/infomation-Admin', infomationAdminRouter);
+app.use('/api/google', google);
+
 
 
 

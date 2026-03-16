@@ -3,7 +3,8 @@ const router = express.Router();
 const { OAuth2Client } = require("google-auth-library");
 const connectSchema = require("../Schema/user");
 const connectToken = require('jsonwebtoken');
-
+const secretKey = process.env.SECRETKEY; // Chữ ký
+const expirationDateTocken = process.env.EXPIRESIN;
 
 // Thông tin lấy từ Google Cloud Console (Dùng file .env cho bảo mật)
 const client = new OAuth2Client(
@@ -26,10 +27,6 @@ router.post("/google-login", async (req, res) => {
         });
 
         const payload = ticket.getPayload();
-        console.log("Google User:", payload);
-        console.log('RUN ----');
-
-
         const newUser = new connectSchema({
             name: payload.name,
             email: payload.email,

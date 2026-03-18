@@ -56,6 +56,11 @@ router.post("/google-register", async (req, res) => {
             googleId: payload.sub,
         });
 
+        // check trùng
+        const checkEmail = await connectSchema.findOne({ email: newUser.email })
+            .select('email');
+        if (checkEmail) return res.status(200).json({ mesage_vn: 'Tài khoản đã tồn tại', mesage_en: 'The account already exists.', status: false });
+
         const result = await newUser.save();
         if (!result) return res.status(400).json({ mesage_vn: 'Thêm tài khoản Google thất bại', mesage_en: 'More user Google failures', status: false });
 

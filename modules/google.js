@@ -14,8 +14,6 @@ const client = new OAuth2Client(
 );
 
 
-
-
 router.post("/google-login", async (req, res) => {
     const { code } = req.body;
     const { tokens } = await client.getToken(code);
@@ -34,7 +32,7 @@ router.post("/google-login", async (req, res) => {
     if (!resultCheck) return res.status(201).json({ message_vn: 'Đăng nhập Google thất bại', message_en: 'Login Google failed', status: false });
     const dataToken = { _id: resultCheck._id }
     const token = connectToken.sign(dataToken, secretKey, { expiresIn: expirationDateTocken });
-    res.status(201).json({ message_vn: 'Đăng nhập Google thành công !', message_en: 'Login Google successful !', token, status: true, role: resultPassword.role });
+    res.status(201).json({ message_vn: 'Đăng nhập Google thành công !', message_en: 'Login Google successful !', token, status: true, role: resultCheck.role });
 });
 
 

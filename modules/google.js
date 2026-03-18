@@ -6,7 +6,7 @@ const connectToken = require('jsonwebtoken');
 const secretKey = process.env.SECRETKEY; // Chữ ký
 const expirationDateTocken = process.env.EXPIRESIN;
 
-// Thông tin lấy từ Google Cloud Console (Dùng file .env cho bảo mật)
+
 const client = new OAuth2Client(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
@@ -15,7 +15,31 @@ const client = new OAuth2Client(
 
 
 
+
 router.post("/google-login", async (req, res) => {
+    const { code } = req.body;
+    const { tokens } = await client.getToken(code);
+    client.setCredentials(tokens);
+
+    const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    const payload = ticket.getPayload();
+    const resultCheck = await connectSchema
+        .findOne({ googleId: payload.sub })
+        .select('password role');
+
+    if (!resultCheck) return res.status(201).json({ message_vn: 'Đăng nhập Google thất bại', message_en: 'Login Google failed', status: false });
+    const dataToken = { _id: resultCheck._id }
+    const token = connectToken.sign(dataToken, secretKey, { expiresIn: expirationDateTocken });
+    res.status(201).json({ message_vn: 'Đăng nhập Google thành công !', message_en: 'Login Google successful !', token, status: true, role: resultPassword.role });
+});
+
+
+
+router.post("/google-register", async (req, res) => {
     try {
         const { code } = req.body;
         const { tokens } = await client.getToken(code);

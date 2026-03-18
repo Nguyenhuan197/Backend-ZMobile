@@ -79,7 +79,34 @@ const stateTransition = async (req, res, next) => {
 }
 
 
+const deleteUser = async (req, res, next) => {
+    const id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const result = await connectSchema.findByIdAndDelete(id);
+        if (!result) return res.status(400).json({ mesage_vn: 'Từ chối thất bại', mesage_en: 'Refuse to fail', status: false });
+        return res.status(200).json({ mesage_vn: 'Từ chối thành công', mesage_en: 'Rejected successfully', status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+
+
 router.post("/add-new", addNew);
 router.get("/view/:idUser", viewAll);
 router.put("/stateTransition/:id/:idUser", stateTransition);
+router.delete("/delete/:id/:idUser", deleteUser);
 module.exports = router;

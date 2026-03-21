@@ -8,7 +8,8 @@ const recruitmentSchema = new mongoose.Schema(
         age: { type: Number, required: true },
         city: { type: String, required: true },
         phone: { type: Number, required: true },
-        status: { type: Boolean, required: true, default: false }
+        status: { type: Boolean, required: true, default: false },
+        date: { type: Date, default: Date.now }
     },
 
     { collection: "Recruitment" }

@@ -11,7 +11,8 @@ const usersSchema = new mongoose.Schema(
         status: { type: Boolean, required: true, default: true },
         deliveryAddress: { type: String, required: true, default: 'Chưa cập nhật' },
         role: { type: String, required: true, default: 'Client' },
-        googleId: { type: String, default: 'NAV Google' }
+        googleId: { type: String, default: 'NAV Google' },
+        date: { type: Date, default: Date.now }
     },
     {
         collection: "Users",

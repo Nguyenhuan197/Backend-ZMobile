@@ -46,18 +46,7 @@ const viewAll = async (req, res, next) => {
     }
 }
 
-const deleteOne = async (req, res, next) => {
-    const _id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
 
-    try {
-        const result = await connectSchema.findByIdAndDelete(_id);
-        if (!result) return res.status(400).json({ mesage_vn: 'Xoá thất bại', mesage_en: 'Delete failed', status: false });
-        return res.status(200).json({ mesage_vn: 'Xoá thành công', mesage_en: 'Delete successful', status: true });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
 
 const stateTransition = async (req, res, next) => {
     const _id = req.params.id;
@@ -79,8 +68,39 @@ const stateTransition = async (req, res, next) => {
 }
 
 
+const update = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const name = req.body;
+        const result = await connectSchema
+            .findByIdAndUpdate(
+                _id,
+                { $set: name },
+                { new: true, runValidators: false }
+            );
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Cập nhật thất bại', mesage_en: 'Update failed', status: false });
+        return res.status(200).json({ mesage_vn: 'Cập nhật thành công', mesage_en: 'Update successful', status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
 router.post("/add/:idUser", addNew);
 router.get("/view", viewAll);
-router.delete("/delete/:id", deleteOne);
 router.put("/stateTransition/:id", stateTransition);
+router.put("/update/:idUser/:id", update);
+
 module.exports = router;

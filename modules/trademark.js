@@ -47,6 +47,30 @@ const viewAll = async (req, res, next) => {
 }
 
 
+const detail = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const result = await connectSchema
+            .findOne({ _id })
+            .select('name img')
+        if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'No data found', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
 
 const stateTransition = async (req, res, next) => {
     const _id = req.params.id;
@@ -100,6 +124,7 @@ const update = async (req, res, next) => {
 
 router.post("/add/:idUser", addNew);
 router.get("/view", viewAll);
+router.get("/detail/:idUser/:id", detail);
 router.put("/stateTransition/:id", stateTransition);
 router.put("/update/:idUser/:id", update);
 

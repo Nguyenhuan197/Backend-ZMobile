@@ -41,7 +41,6 @@ const viewAll_Admin = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({ status })
-            .select('name email phone content idUser')
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {

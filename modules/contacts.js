@@ -50,8 +50,16 @@ const viewAll_Admin = async (req, res, next) => {
 
 const stateTransitionAdmin = async (req, res, next) => {
     const _id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
     const { status } = req.query;
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
 
     try {
         const result = await connectSchema
@@ -71,5 +79,5 @@ const stateTransitionAdmin = async (req, res, next) => {
 
 router.post("/add", addNew);
 router.get("/view-admin/:idUser", viewAll_Admin);
-router.put("/stateTransition-admin/:id", stateTransitionAdmin);
+router.put("/stateTransition-admin/:idUser/:id", stateTransitionAdmin);
 module.exports = router;

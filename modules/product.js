@@ -9,6 +9,23 @@ const connectSchema__User = require("../Schema/user");
 
 
 
+const getAllProduct = async (req, res, next) => {
+    try {
+        const result = await connectSchema
+            .find({
+                status: true,
+                priceSale: 0
+            })
+            .select('name price priceSale img remainingQuantity')
+            .limit(50);
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
 
 // Danh sách sản phẩm điện thoại
 const getProduct_Phone = async (req, res, next) => {
@@ -408,13 +425,12 @@ const Admin_EditProduct = async (req, res, next) => {
 
 
 
-
 // Cline
+router.get("/view-all", getAllProduct); // danh sách tất cả sản phẩm
 router.get("/view-product-phone", getProduct_Phone); // dánh sách sản phẩm điện thoại
-router.get("/view-product-accessory", getProduct_Accessory);
+router.get("/view-product-accessory", getProduct_Accessory); // danh sách sản phẩm phụ kiện
 router.get("/view-Trademark-Product/:id", TrademarkPrduct); // 
 router.get("/view-sale", salePrice); // danh sách sản phẩm SALE 
-
 
 
 //

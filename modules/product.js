@@ -14,7 +14,6 @@ const getAllProduct = async (req, res, next) => {
         const result = await connectSchema
             .find({
                 status: true,
-                priceSale: 0
             })
             .select('name price priceSale img remainingQuantity')
             .limit(50);

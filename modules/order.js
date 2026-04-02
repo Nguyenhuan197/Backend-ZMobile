@@ -123,6 +123,23 @@ const stateTransition = async (req, res, next) => {
     }
 }
 
+const handleSearchOrder = async (req, res, next) => {
+    const _id = req.params.id;
+    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    try {
+        const result = await OrderItem
+            .findOne({ _id })
+            .select('id_product priceAtPurchase statusOrder')
+            .populate('id_product', 'name price img')
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
+
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
 
 
 
@@ -130,6 +147,7 @@ const stateTransition = async (req, res, next) => {
 router.post("/add", addNew);
 router.get("/Admin_viewDetail/:id", Admin_viewDetail);
 router.get("/Admin_viewDetail_itemOrder/:id", Admin_viewDetail_ItemOrder);
+router.get("/serch-order-item/:id", handleSearchOrder);
 
 
 // ### Admin

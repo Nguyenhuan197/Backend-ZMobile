@@ -124,12 +124,17 @@ const stateTransition = async (req, res, next) => {
 }
 
 const handleSearchOrder = async (req, res, next) => {
-    const _id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    const code = req.params.id;
+    if (!code) {
+        return res.status(400).json({
+            mesage_vn: 'Vui lòng cung cấp mã đơn hàng',
+            status: false
+        });
+    }
 
     try {
         const result = await OrderItem
-            .findOne({ _id })
+            .findOne({ shippingCode: code })
             .select('id_product priceAtPurchase statusOrder')
             .populate('id_product', 'name price img')
 

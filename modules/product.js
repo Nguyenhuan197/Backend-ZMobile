@@ -9,20 +9,6 @@ const connectSchema__User = require("../Schema/user");
 
 
 
-const getAllProduct = async (req, res, next) => {
-    try {
-        const result = await connectSchema
-            .find({
-                status: true,
-            })
-            .select('name price priceSale img remainingQuantity')
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
 
 
 
@@ -420,6 +406,36 @@ const Admin_EditProduct = async (req, res, next) => {
         if (error) return next(error);
     }
 };
+
+
+
+// Fix chỗ này
+const getAllProduct = async (req, res, next) => {
+    const limit = parseInt(req.query.limit) || 10;
+    const page = parseInt(req.query.page) || 1;
+    const skip = (page - 1) * limit;
+
+    try {
+        const result = await connectSchema
+            .find({ status: true })
+            .select('name price priceSale img remainingQuantity')
+            .sort({ _id: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const totalItems = await connectSchema.countDocuments();
+        const totalPages = Math.ceil(totalItems / limit);
+
+        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({
+            mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful',
+            data: result, pagination: { totalItems, totalPages, currentPage: page },
+            status: false
+        });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
 
 
 

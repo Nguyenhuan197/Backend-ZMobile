@@ -134,8 +134,8 @@ const Admin__viewAll = async (req, res, next) => {
         const find = statusOrder === "All" ? {} : { statusOrder: statusOrder };
         const result = await OrderItem
             .find(find)
-            .select('_id id_product')
-            .populate('id_product', 'name price img Shipping shippingCode')
+            .select('_id id_product shippingCode statusOrder')
+            .populate('id_product', 'name price img Shipping')
 
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });

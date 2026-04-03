@@ -3,6 +3,9 @@ const router = express.Router();
 const connectSchema = require("../Schema/order");
 const OrderItem = require("../Schema/orderItems");
 const mongoose = require('mongoose');
+const CheckToken = require("../modules/middlewares/checkToken");
+const auth = new CheckToken();
+const connectSchema__User = require("../Schema/user");
 
 
 
@@ -56,27 +59,14 @@ const addNew = async (req, res, next) => {
     }
 };
 
-
-const Admin__viewAll = async (req, res, next) => {
-    try {
-        const result = await connectSchema
-            .find({})
-            .select('shippingInfo id_user paymentMethod totalPrice statusOrder')
-        if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
-
-const Admin_viewDetail = async (req, res, next) => {
+const ViewDetailOrder = async (req, res, next) => {
     const id_user = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id_user)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
 
     try {
         const result = await connectSchema
             .find({ id_user })
-            .select('shippingInfo id_user paymentMethod totalPrice statusOrder')
+            .select('shippingInfo id_user paymentMethod totalPrice')
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {
@@ -85,14 +75,14 @@ const Admin_viewDetail = async (req, res, next) => {
 }
 
 
-const Admin_viewDetail_ItemOrder = async (req, res, next) => {
+const ViewDetail_ItemOrder = async (req, res, next) => {
     const id_order = req.params.id;
     if (!mongoose.Types.ObjectId.isValid(id_order)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
 
     try {
         const result = await OrderItem
             .find({ id_order })
-            .populate('id_product', 'name price img')
+            .populate('id_product', 'name price img statusOrder shippingCode')
         if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {
@@ -100,28 +90,6 @@ const Admin_viewDetail_ItemOrder = async (req, res, next) => {
     }
 }
 
-
-
-
-const stateTransition = async (req, res, next) => {
-    const _id = req.params.id;
-    if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
-    const { status } = req.query;
-
-    try {
-        const result = await connectSchema
-            .findByIdAndUpdate(
-                _id,
-                { $set: { status: status } },
-                { new: true, runValidators: false }
-            );
-
-        if (!result) return res.status(400).json({ mesage_vn: 'Chuyển đổi trạng thái thất bại', mesage_en: 'State transition failed', status: false });
-        return res.status(200).json({ mesage_vn: 'Chuyển đổi trạng thái thành công', mesage_en: 'State transition successful', status: true });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
 
 const handleSearchOrder = async (req, res, next) => {
     const code = req.params.id;
@@ -147,16 +115,105 @@ const handleSearchOrder = async (req, res, next) => {
 }
 
 
+// Phần ADMIN ---
+const Admin__viewAll = async (req, res, next) => {
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    const { statusOrder } = req.query;
+    if (!statusOrder) return res.status(404).json({ mesage_vn: 'Lỗi hệ thống', mesage_en: 'System error', Status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const find = statusOrder === "All" ? {} : { statusOrder: statusOrder };
+        const result = await OrderItem
+            .find(find)
+            .select('_id id_product')
+            .populate('id_product', 'name price img Shipping shippingCode')
+
+        if (result.length === 0) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+const stateTransition = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    const { statusOrder } = req.query;
+    if (!statusOrder) return res.status(404).json({ mesage_vn: 'Lỗi hệ thống', mesage_en: 'System error', Status: false });
+
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+
+    try {
+        const result = await OrderItem
+            .findByIdAndUpdate(
+                _id,
+                { $set: { statusOrder: statusOrder } },
+                { new: true, runValidators: false }
+            );
+
+        if (!result) return res.status(400).json({ mesage_vn: 'Chuyển đổi trạng thái thất bại', mesage_en: 'State transition failed', status: false });
+        return res.status(200).json({ mesage_vn: 'Chuyển đổi trạng thái thành công', mesage_en: 'State transition successful', status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
+
+const Admin_viewDetail_ItemOrder = async (req, res, next) => {
+    const _id = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(_id || idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+    try {
+        const result = await OrderItem
+            .findOne({ _id })
+            .populate('id_product', 'name price img statusOrder shippingCode')
+
+        console.log(result);
+        if (!result) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
 
 // ## Cline 
-router.post("/add", addNew);
-router.get("/Admin_viewDetail/:id", Admin_viewDetail);
-router.get("/Admin_viewDetail_itemOrder/:id", Admin_viewDetail_ItemOrder);
-router.get("/serch-order-item/:id", handleSearchOrder);
+router.post("/add", addNew); // Thêm mới đơn hàng
+router.get("/listOrder-UserOne/:id", ViewDetailOrder); // danh sách đơn hàng tài khoản
+router.get("/viewDetail_itemOrder/:id", ViewDetail_ItemOrder); // xem chi tiết đơn hàng nhỏ
+router.get("/serch-order-item/:id", handleSearchOrder); // tìm kiếm đơn hàng
 
 
 // ### Admin
-// -- danh sách đơn hàng
-router.get("/Admin__viewAll", Admin__viewAll);
-router.put("/state-Transition/:id", stateTransition);
+router.get("/Admin-viewAll/:idUser", Admin__viewAll); // view tất cả danh sách đơn hàng
+router.get("/Admin-viewAll-detail/:idUser/:id", Admin_viewDetail_ItemOrder); // xem chi tiết danh sách đơn hàng
+router.put("/Admin-state-Transition/:idUser/:id", stateTransition); // chuyển đổi trạng thái đơn hàng
 module.exports = router;

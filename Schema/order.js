@@ -16,16 +16,8 @@ const OrderSchema = new mongoose.Schema(
             default: 'COD'
         },
 
-        totalPrice: { type: Number, required: true }, // Tổng tiền cuối cùng (đã cộng ship)
+        totalPrice: { type: Number, required: true },
         shippingFee: { type: Number, default: 0 },
-
-        statusOrder: {
-            type: String,
-            required: true,
-            enum: ['Awaiting confirmation', 'Processing', 'Shipping', 'Delivered', 'Cancelled'],
-            default: 'Awaiting confirmation'
-        },
-
         dateOfPurchase: { type: Date, default: Date.now }
     },
     { collection: "Order", timestamps: true }

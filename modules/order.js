@@ -204,6 +204,39 @@ const Admin_viewDetail_ItemOrder = async (req, res, next) => {
 }
 
 
+const handleSearchOrderAdmin = async (req, res, next) => {
+    const code = req.params.id;
+    const idUser = req.params.idUser;
+    if (!mongoose.Types.ObjectId.isValid(idUser)) return res.status(404).json({ mesage_vn: 'Lỗi truy vấn', mesage_en: 'Erro query', Status: false });
+    if (!code) return res.status(400).json({ mesage_vn: 'Vui lòng cung cấp mã đơn hàng', status: false });
+
+    // Check Token
+    const token = req.headers.authorization?.split(' ')[1];
+    const decoded = auth.verifyAccessToken(token);
+    if (idUser !== decoded._id) return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+    const checkRole = await connectSchema__User.findOne({ _id: decoded._id }).select('role');
+    if (!checkRole || checkRole.role !== 'Admin') return res.status(401).json({ message_en: 'You do not have access.', message_vn: 'Bạn không có quyền truy cập', status: false, data: [] });
+
+    try {
+        const resultOrder = await OrderItem
+            .findOne({ shippingCode: code })
+            .select('id_product priceAtPurchase statusOrder')
+            .populate('id_product', 'name price img')
+            .populate('id_order', 'paymentMethod id_user')
+
+        const resultUser = await connectSchema__User
+            .findOne({ _id: resultOrder.id_order.id_user })
+            .select('name phone email image deliveryAddress updatedAt');
+
+        if (!resultOrder) return res.status(400).json({ mesage_vn: 'Không có dữ liệu', mesage_en: 'No data found', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: { dataOrder: resultOrder, dataUser: resultUser }, status: true });
+
+    } catch (error) {
+        if (error) return next(error);
+    }
+}
+
+
 
 // ## Cline 
 router.post("/add", addNew); // Thêm mới đơn hàng
@@ -216,4 +249,5 @@ router.get("/serch-order-item/:id", handleSearchOrder); // tìm kiếm đơn hà
 router.get("/Admin-viewAll/:idUser", Admin__viewAll); // view tất cả danh sách đơn hàng
 router.get("/Admin-viewAll-detail/:idUser/:id", Admin_viewDetail_ItemOrder); // xem chi tiết danh sách đơn hàng
 router.put("/Admin-state-Transition/:idUser/:id", stateTransition); // chuyển đổi trạng thái đơn hàng
+router.get("/Admin-serch-order-item/:idUser/:id", handleSearchOrderAdmin); // tìm kiếm đơn hàng
 module.exports = router;

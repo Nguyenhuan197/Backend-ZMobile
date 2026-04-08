@@ -8,10 +8,6 @@ const connectSchema__User = require("../Schema/user");
 
 
 
-
-
-
-
 // Danh sách sản phẩm điện thoại
 const getProduct_Phone = async (req, res, next) => {
     const { status } = req.query;
@@ -24,7 +20,7 @@ const getProduct_Phone = async (req, res, next) => {
                 },
                 priceSale: 0
             })
-            .select('name price priceSale img remainingQuantity')
+            .select('name price priceSale img remainingQuantity sold')
             .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
@@ -33,7 +29,7 @@ const getProduct_Phone = async (req, res, next) => {
     }
 }
 
-
+// danh sách sản phẩm phụ kiện
 const getProduct_Accessory = async (req, res, next) => {
     const { status } = req.query;
     try {
@@ -43,7 +39,7 @@ const getProduct_Accessory = async (req, res, next) => {
                 id_Trademark: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9"),
                 priceSale: 0
             })
-            .select('name price priceSale img remainingQuantity')
+            .select('name price priceSale img remainingQuantity sold')
             .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
@@ -70,8 +66,8 @@ const getProductDetail = async (req, res, next) => {
                 id_Trademark: result.id_Trademark._id,
                 _id: { $ne: _id }
             })
-            .select('name price img')
-            .limit(5);
+            .select('name price img sold remainingQuantity')
+            .limit(7);
 
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: true, similarProducts: productRelateTo });
@@ -122,7 +118,7 @@ const advertisement = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({ advertisement: true, status: true })
-            .select('name price img priceSale remainingQuantity')
+            .select('name price img priceSale remainingQuantity sold')
             .limit(8);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
@@ -143,7 +139,7 @@ const TrademarkPrduct = async (req, res, next) => {
                 status: true,
                 id_Trademark
             })
-            .select('name price priceSale img remainingQuantity')
+            .select('name price priceSale img remainingQuantity sold')
             .limit(50);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
@@ -161,7 +157,7 @@ const salePrice = async (req, res, next) => {
                 status: true,
                 priceSale: { $gt: 1 } // Sửa lỗi cú pháp so sánh ở đây
             })
-            .select('name price img priceSale remainingQuantity')
+            .select('name price img priceSale remainingQuantity sold')
             .limit(10);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
         return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
@@ -173,18 +169,7 @@ const salePrice = async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
-
-
-
 // -------------- ADMIN ------------------
-
 const addProductLogic = async (req, res, next) => {
     const _id = req.params.idUser;
     if (!mongoose.Types.ObjectId.isValid(_id)) return res.status(404).json({ error: 'Invalid _id', Status: false, data: [] });
@@ -229,7 +214,7 @@ const Admin_SelectProduct = async (req, res, next) => {
         const filter = status === 'NAV' ? {} : { status };
         const result = await connectSchema
             .find(filter)
-            .select('name price img advertisement remainingQuantity status')
+            .select('name price img advertisement remainingQuantity sold status')
             .limit(50);
 
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -256,9 +241,9 @@ const Admin__DetailProduct = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({ _id })
-            .limit(50);
+            .limit(100);
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: true });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: true });
     } catch (error) {
         if (error) return next(error);
     }
@@ -284,9 +269,9 @@ const Admin_SelectProductSale = async (req, res, next) => {
             const result = await connectSchema
                 .find({
                     status: true,
-                    priceSale: { $gt: 1 } // Sửa lỗi cú pháp so sánh ở đây
+                    priceSale: { $gt: 1 }
                 })
-                .select('name price img priceSale remainingQuantity')
+                .select('name price img priceSale remainingQuantity sold')
                 .limit(10);
 
             if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -299,7 +284,7 @@ const Admin_SelectProductSale = async (req, res, next) => {
                     status: true,
                     priceSale: 0
                 })
-                .select('name price img priceSale remainingQuantity')
+                .select('name price img priceSale remainingQuantity sold')
                 .limit(10);
 
             if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -332,7 +317,7 @@ const Admin_SelectProductAdvertisement = async (req, res, next) => {
                 status: true,
                 advertisement: isAdvertisement  // Sửa lỗi cú pháp so sánh ở đây
             })
-            .select('name price img priceSale remainingQuantity advertisement')
+            .select('name price img priceSale remainingQuantity sold advertisement')
             .limit(10);
 
         if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
@@ -408,8 +393,6 @@ const Admin_EditProduct = async (req, res, next) => {
 };
 
 
-
-// Fix chỗ này
 const getAllProduct = async (req, res, next) => {
     const limit = parseInt(req.query.limit) || 10;
     const page = parseInt(req.query.page) || 1;
@@ -418,7 +401,7 @@ const getAllProduct = async (req, res, next) => {
     try {
         const result = await connectSchema
             .find({ status: true })
-            .select('name price priceSale img remainingQuantity')
+            .select('name price priceSale img remainingQuantity sold')
             .sort({ _id: -1 })
             .skip(skip)
             .limit(limit);
@@ -467,8 +450,5 @@ router.get("/admin-Select-ProductSale&No-Sale/:idUser", Admin_SelectProductSale)
 // Quảng cáo
 router.get("/admin-Select-ProductAdvertisement/:idUser", Admin_SelectProductAdvertisement);
 router.put("/admin-state-Transition-ProductAdvertisement/:id/:idUser", Admin_transitionAdvertisement);
-
-
-
 router.put("/state-Transition/:id", stateTransition);
 module.exports = router;

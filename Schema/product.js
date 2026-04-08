@@ -22,6 +22,7 @@ const productSchema = new mongoose.Schema(
         imgDetail: [imageSchema],
         status: { type: Boolean, default: true },
         view: { type: Number, default: 1, required: true },
+        sold: { type: Number, default: 1, required: true },
         present: { type: String, require: true, default: 'Nav' },
         advertisement: { type: Boolean, require: true, default: false }
 

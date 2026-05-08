@@ -76,6 +76,7 @@ const getProductDetail = async (req, res, next) => {
     }
 }
 
+
 // chuyển đổi trạng thái
 const stateTransition = async (req, res, next) => {
     const _id = req.params.id;
@@ -430,7 +431,6 @@ router.get("/view-product-accessory", getProduct_Accessory); // danh sách sản
 router.get("/view-Trademark-Product/:id", TrademarkPrduct); // 
 router.get("/view-sale", salePrice); // danh sách sản phẩm SALE 
 
-
 //
 router.get("/viewDetail/:id", getProductDetail); // chi tiết sản phẩm
 router.get("/search-Product", searchProduct); // tìm kiếm sản phẩm
@@ -438,7 +438,7 @@ router.get("/view-advertisement", advertisement); // slide quảng cáo
 
 
 // Admin
-router.post("/add/:idUser", addProductLogic);
+router.post("/add/:idUser", addProductLogic); // Thêm mới sản phẩm
 router.put("/admin-Product-Edit/:id/:idUser", Admin_EditProduct);
 
 router.get("/admin-SelectAll/:idUser", Admin_SelectProduct); // tất cả sản phẩm 

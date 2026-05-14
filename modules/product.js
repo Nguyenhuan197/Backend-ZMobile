@@ -72,8 +72,8 @@ const getProduct_Accessory = async (req, res, next) => {
     }
 }
 
-
-const TrademarkPrduct = async (req, res, next) => {
+// danh sách sản phẩm thương hiệu loa 
+const trademarkPrduct = async (req, res, next) => {
     const { status } = req.query;
     try {
         const result = await connectSchema
@@ -456,7 +456,7 @@ router.get("/view-product-loudspeaker", getProduct_Loudspeaker); // dánh sách 
 
 
 router.get("/view-product-accessory", getProduct_Accessory); // danh sách sản phẩm phụ kiện
-router.get("/view-Trademark-Product/:id", TrademarkPrduct); // danh sách sản phẩm loa
+router.get("/view-trademark-product", trademarkPrduct); // danh sách sản phẩm loa
 router.get("/view-sale", salePrice); // danh sách sản phẩm SALE 
 
 //

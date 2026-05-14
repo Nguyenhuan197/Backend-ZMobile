@@ -16,42 +16,23 @@ const getProduct_Phone = async (req, res, next) => {
             .find({
                 status,
                 id_Trademark: {
-                    $ne: new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9")
+                    $nin: [
+                        new mongoose.Types.ObjectId("699eb6d3dfb6f292d07d88c9"),
+                        new mongoose.Types.ObjectId("6a00b3c8fd14f9373e1e5448")
+                    ]
                 },
                 priceSale: 0
             })
             .select('name price priceSale img remainingQuantity sold')
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
+            .limit(50)
+            .lean();
+
+        if (result.length === 0) return res.status(200).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
+        return res.status(200).json({ mesage_vn: 'Truy vấn thành công', mesage_en: 'Query successful', data: result, status: false });
     } catch (error) {
         if (error) return next(error);
     }
 }
-
-
-// Danh sách sản phẩm điện thoại
-const getProduct_Loudspeaker = async (req, res, next) => {
-    const { status } = req.query;
-    try {
-        const result = await connectSchema
-            .find({
-                status,
-                id_Trademark: {
-                    $ne: new mongoose.Types.ObjectId("6a00b3c8fd14f9373e1e5448")
-                },
-                priceSale: 0
-            })
-            .select('name price priceSale img remainingQuantity sold')
-            .limit(50);
-        if (result.length === 0) return res.status(201).json({ mesage_vn: 'Không tìm thấy dữ liệu', mesage_en: 'Query failed', data: [], status: false });
-        return res.status(200).json({ mesage_vn: 'Truy vấn thành công nhé bạn', mesage_en: 'Query successful', data: result, status: false });
-    } catch (error) {
-        if (error) return next(error);
-    }
-}
-
-
 
 // danh sách sản phẩm phụ kiện
 const getProduct_Accessory = async (req, res, next) => {
@@ -452,11 +433,8 @@ const getAllProduct = async (req, res, next) => {
 // Cline
 router.get("/view-all", getAllProduct); // danh sách tất cả sản phẩm
 router.get("/view-product-phone", getProduct_Phone); // dánh sách sản phẩm điện thoại
-router.get("/view-product-loudspeaker", getProduct_Loudspeaker); // dánh sách sản phẩm loa
-
-
-router.get("/view-product-accessory", getProduct_Accessory); // danh sách sản phẩm phụ kiện
-router.get("/view-trademark-product", trademarkPrduct); // danh sách sản phẩm loa
+router.get("/view-product-accessory", getProduct_Accessory); // danh sách sản phẩm phụ kiện trang chủ
+router.get("/view-trademark-product", trademarkPrduct); // danh sách sản phẩm loa trang chủ
 router.get("/view-sale", salePrice); // danh sách sản phẩm SALE 
 
 //
